@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Gold Production the World</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Concillia Mpofu" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <link href="libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="libs/datatables-binding/datatables.js"></script>
+    <script src="libs/jquery/jquery-3.6.0.min.js"></script>
+    <link href="libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
+    <link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+    <script src="libs/crosstalk/js/crosstalk.min.js"></script>
+    <link href="libs/leaflet/leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet/leaflet.js"></script>
+    <link href="libs/leafletfix/leafletfix.css" rel="stylesheet" />
+    <script src="libs/proj4/proj4.min.js"></script>
+    <script src="libs/Proj4Leaflet/proj4leaflet.js"></script>
+    <link href="libs/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet-binding/leaflet.js"></script>
+    <script src="libs/leaflet-providers/leaflet-providers_1.9.0.js"></script>
+    <script src="libs/leaflet-providers-plugin/leaflet-providers-plugin.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Gold Production the World
+## 2010-2020
+### Concillia Mpofu
+### School of Public Affairs
+### 2021/12/10
+
+---
+
+
+
+
+
+
+# Background
+
+Gold mining is a global business with operations on every continent, except Antarctica, and gold is extracted from mines of widely varying types and scale.
+
+At a country level, China was the largest producer in the world in 2020 and accounted for around 11 per cent of total global production. Our interactive gold mining map provides a breakdown of the top gold producing countries in the world, which demonstrates the geographical dispersion of gold mining operations and the gold supply.
+
+.center[
+  ![](https://upload.wikimedia.org/wikipedia/commons/d/d4/Map_of_gold_production.svg)
+]
+
+---
+# Areas of focus 
+
+- Data Cleaning &amp; Wrangling
+- Top 10 Gold Producers
+- Individual Country Production over 10 year period
+- Gold Production Map Location 
+
+
+---
+# Data Cleaning &amp; Wrangling
+
+--
+
+-&gt;Data from source : https://www.gold.org/goldhub/data/historical-mine-production
+
+--
+
+-&gt;Data Cleaning : Clean up the world data to remain with the Top 10 Gold Producers
+
+--
+
+-&gt;Raw Data File &gt; Renamed Columns &gt;  Selected Years &gt; Filtered out all unncessary data&gt; remianed with Top 10 Producers
+
+--
+.center[
+  ![](https://upload.wikimedia.org/wikipedia/commons/9/99/Broom_icon_R.svg)]
+
+
+
+
+```r
+library(readr)
+library(dplyr)
+
+Gold_Mining_Production &lt;- read_csv("Gold_Mining_Production.csv") %&gt;%
+ rename("2010" = ...2, "2011" = ...3, "2012" = ...4, "2013" = ...5, "2014" = ...6, "2015" = ...7, "2016" = ...8, "2017" = ...9, "2018" = ...10, "2019" = ...11, "2020" = ...12, "2021" = ...13, Country = `Gold Mine Production (tonnes)`) %&gt;%
+select(Country, "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020") %&gt;%
+  filter(!Country %in% c("Sub-total", "Other", "Global Total", "")) %&gt;%
+  na.omit()
+```
+
+```
+## New names:
+## * `` -&gt; ...2
+## * `` -&gt; ...3
+## * `` -&gt; ...4
+## * `` -&gt; ...5
+## * `` -&gt; ...6
+## * ...
+```
+
+```
+## Rows: 82 Columns: 13
+```
+
+```
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: ","
+## chr (1): Gold Mine Production (tonnes)
+## lgl (1): ...13
+```
+
+```
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+
+```r
+print(Gold_Mining_Production)
+```
+
+```
+## # A tibble: 44 × 12
+##    Country `2010` `2011` `2012` `2013` `2014` `2015` `2016` `2017` `2018` `2019`
+##    &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+##  1 United…  231.   234.   235.   230.   210    217.   229.   236.   225.   200. 
+##  2 Canada   102.   102    106.   131.   151.   158.   163.   171.   189.   183. 
+##  3 Mexico    78.7   94.4  108.   107.   113.   131.   131.   120.   118.   109  
+##  4 Peru     185.   184.   190.   182.   171.   170.   166    167.   163.   143. 
+##  5 Brazil    71.5   77.7   80.2   89.3   90.4   95.4   95.9   95.4   96.7  100. 
+##  6 Argent…   63.9   59     54.2   49.7   60     63.9   58     61.4   58.3   52.5
+##  7 Colomb…   43.6   45.9   56.2   46     47.9   49.6   53.2   53.2   43.9   45.5
+##  8 Chile     39.5   45.1   49.9   51.3   46     42.5   40.7   35.8   36.5   37.8
+##  9 Domini…    0.1    0.5    4.2   26.6   36.2   31.2   38     35.3   31.7   31.8
+## 10 Venezu…   24.9   25.5   21     22.8   22.7   22.6   23     23     26     27.8
+## # … with 34 more rows, and 1 more variable: 2020 &lt;dbl&gt;
+```
+
+
+```r
+Gold_Production_Total &lt;- Gold_Mining_Production %&gt;%
+  rowwise() %&gt;%
+  mutate(total = sum(c_across("2010":"2020"))) %&gt;%
+  arrange(desc(total)) %&gt;%
+  filter(total &gt; 1000)
+```
+
+---
+# Final Data
+
+
+```r
+Gold_Production_Total %&gt;% DT::datatable()
+```
+
+<div id="htmlwidget-7eebc63540bf4877853b" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7eebc63540bf4877853b">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10"],["China","Australia","Russia","United States","Peru","South Africa","Canada","Ghana","Mexico","Indonesia"],[351.1,256.7,203.1,231.3,184.8,210,102.1,94.3,78.7,132.3],[371.2,258.7,211.6,233.9,183.8,205.3,102,96.8,94.4,110.2],[413.3,250.4,233.4,234.6,189.8,179.8,106.4,106,107.5,82.6],[438.4,267.1,248.5,230.1,182.4,179.5,131.4,105.8,107.1,90],[462,274,252.7,210,171.1,168.6,151.2,106.3,113.3,93.5],[460.3,279.2,255.3,216.7,170.5,162,157.7,95.4,131.1,115.1],[463.7,287.7,262.4,229.1,166,162.6,163.1,131.4,130.7,118.4],[429.1,292.5,280.7,236.3,166.6,154,171.2,133.3,119.6,117.6],[404.1,313,295.4,224.9,162.6,128,188.9,149.1,118.4,153],[383.2,325.1,329.5,200.4,143.3,111.3,182.9,142.4,109,92.3],[368.3,327.8,331.1,190.2,97.8,99.2,170.6,138.7,101.6,100.9],[4544.7,3132.2,2903.7,2437.5,1818.7,1760.3,1627.5,1299.5,1211.4,1205.9]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Country<\/th>\n      <th>2010<\/th>\n      <th>2011<\/th>\n      <th>2012<\/th>\n      <th>2013<\/th>\n      <th>2014<\/th>\n      <th>2015<\/th>\n      <th>2016<\/th>\n      <th>2017<\/th>\n      <th>2018<\/th>\n      <th>2019<\/th>\n      <th>2020<\/th>\n      <th>total<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,8,9,10,11,12,13]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+
+
+```r
+Gold_Production_Total_0utput &lt;- Gold_Production_Total %&gt;%
+  drop_na() %&gt;%
+  mutate(Country = fct_reorder(Country, total)) %&gt;%
+  ggplot(aes(x = total, y = Country, fill = total)) +
+  geom_col(show.legend = F) +
+  scale_fill_gradient(low = "yellow", high = "red", na.value = "gray90") +
+  theme_minimal() +
+  labs(x = "*Gold production in tonnes*", y = "", title = "Top 10 World Gold Producers from 2010-2020")
+```
+
+---
+
+# Top 10 Gold Producers from 2010 - 2020
+
+
+```r
+print(Gold_Production_Total_0utput)
+```
+
+![](Xaringan-Prezz_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+---
+# Country by Country Data 
+
+Here we used Pivot longer to view country by country data. 
+
+
+```r
+Gold_Production_Total_longer &lt;- Gold_Production_Total %&gt;%
+  pivot_longer(c("2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020"), names_to = "year", values_to = "tonnes")
+
+print(Gold_Production_Total_longer)
+```
+
+```
+## # A tibble: 110 × 4
+##    Country total year  tonnes
+##    &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;
+##  1 China   4545. 2010    351.
+##  2 China   4545. 2011    371.
+##  3 China   4545. 2012    413.
+##  4 China   4545. 2013    438.
+##  5 China   4545. 2014    462 
+##  6 China   4545. 2015    460.
+##  7 China   4545. 2016    464.
+##  8 China   4545. 2017    429.
+##  9 China   4545. 2018    404.
+## 10 China   4545. 2019    383.
+## # … with 100 more rows
+```
+---
+# Country to Country Gold Production from 2010-2020
+
+.pull-left[
+
+```r
+Country_by_country&lt;- ggplot(Gold_Production_Total_longer, aes( year, tonnes, group = Country, colour = Country)) +
+  geom_line(size = 2) +
+  facet_wrap(vars(Country)) +
+  ggtitle("Individual Country Data Gold Production from 2010 - 2020") +
+    cowplot::theme_minimal_vgrid(12) +
+  theme(
+    axis.title.x =element_text(), 
+    legend.position = "none",
+    axis.text.x = element_text(angle = 90)
+  ) +
+  scale_fill_manual(values = c("#B0B0B0D0", "#D55E00D0")) +
+  ylab("Tonnes")+
+  xlab("Year")
+```
+
+]
+
+.pull-right[
+&lt;img src="Xaringan-Prezz_files/figure-html/unnamed-chunk-8-1.png" width="100%" /&gt;
+
+]
+
+
+
+
+```r
+map_data &lt;- map_data("world")
+```
+
+
+
+```r
+Gold_Mining_Map_Data &lt;- rename(Gold_Production_Total, region = Country) %&gt;%
+  mutate(
+    region = ifelse(region == "United States", "USA", region)
+  )
+```
+
+
+```r
+mapdata &lt;- left_join(map_data, Gold_Mining_Map_Data, by = "region")
+```
+
+
+```r
+Goldmap &lt;- ggplot(mapdata, aes(long, lat, group = group)) +
+  geom_polygon(aes(fill = total), color = "white") +
+  scale_fill_viridis() +
+  theme_bw() +
+  labs(
+    title = "Highest gold producing countries/locations from 2010 - 2020",
+    x = "", y = "", fill = "Total tonnes"
+  )
+```
+
+---
+
+#Gold Production Locations in the World Map 
+
+
+```r
+print(Goldmap)
+```
+
+&lt;img src="Xaringan-Prezz_files/figure-html/unnamed-chunk-13-1.png" width="75%" height="100%" /&gt;
+
+---
+#Live Map Visualization
+
+```r
+library(leaflet)
+leaflet() %&gt;%
+  setView(lng = 18.26123, lat = -33.42168
+, zoom = 2) %&gt;%
+  addProviderTiles(providers$Esri.NatGeoWorldMap)
+```
+
+<div id="htmlwidget-e350b42eca5895c13058" style="width:100%;height:504px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e350b42eca5895c13058">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"setView":[[-33.42168,18.26123],2,[]],"calls":[{"method":"addProviderTiles","args":["Esri.NatGeoWorldMap",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]}]},"evals":[],"jsHooks":[]}</script>
+
+---
+##.center[
+  ![](https://upload.wikimedia.org/wikipedia/commons/6/6f/End_plate.svg)
+]
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "arta",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"class": "center, middle, animated, slideInRight"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
